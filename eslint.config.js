@@ -1,0 +1,24 @@
+const {
+    defineConfig,
+    globalIgnores,
+} = require("eslint/config");
+
+const js = require("@eslint/js");
+
+const {
+    FlatCompat,
+} = require("@eslint/eslintrc");
+
+const compat = new FlatCompat({
+    baseDirectory: __dirname,
+    recommendedConfig: js.configs.recommended,
+    allConfig: js.configs.all
+});
+
+module.exports = defineConfig([{
+    extends: compat.extends("expo", "eslint:recommended", "universe/native"),
+
+    rules: {
+        "react-hooks/exhaustive-deps": "warn",
+    },
+}, globalIgnores([".expo", "**/node_modules"])]);
