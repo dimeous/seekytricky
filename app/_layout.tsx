@@ -17,6 +17,10 @@ import { adaptNavigationTheme, PaperProvider } from 'react-native-paper'
 
 import { Locales, Setting, StackHeader, Themes } from '@/lib'
 
+// ✅ Redux
+import { Provider as ReduxProvider } from 'react-redux'
+import { store } from '@/lib/store'
+
 // Catch any errors thrown by the Layout component.
 export { ErrorBoundary } from 'expo-router'
 
@@ -33,7 +37,6 @@ const RootLayout = () => {
     ...MaterialCommunityIcons.font,
   })
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   React.useEffect(() => {
     if (error) throw error
   }, [error])
@@ -59,7 +62,6 @@ const RootLayoutNav = () => {
     language: 'auto',
   })
 
-  // Load settings from the device
   React.useEffect(() => {
     if (Platform.OS !== 'web') {
       SecureStore.getItemAsync('settings').then((result) => {
@@ -68,13 +70,11 @@ const RootLayoutNav = () => {
             (res) => console.log(res),
           )
         }
-
         setSettings(JSON.parse(result ?? JSON.stringify(settings)))
       })
     } else {
       setSettings({ ...settings, theme: colorScheme ?? 'light' })
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -84,7 +84,6 @@ const RootLayoutNav = () => {
     } else {
       Locales.locale = settings.language
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -101,38 +100,40 @@ const RootLayoutNav = () => {
   })
 
   return (
-    <ThemeProvider
-      value={
-        colorScheme === 'light'
-          ? { ...LightTheme, fonts: NavLightTheme.fonts }
-          : { ...DarkTheme, fonts: NavDarkTheme.fonts }
-      }
-    >
-      <PaperProvider theme={theme}>
-        <Stack
-          screenOptions={{
-            animation: 'slide_from_bottom',
-            header: (props) => (
-              <StackHeader navProps={props} children={undefined} />
-            ),
-          }}
-        >
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="drawer" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="search"
-            options={{ title: Locales.t('search') }}
-          />
-          <Stack.Screen
-            name="modal"
-            options={{ title: Locales.t('titleModal'), presentation: 'modal' }}
-          />
-        </Stack>
-      </PaperProvider>
+    <ReduxProvider store={store}>
+      <ThemeProvider
+        value={
+          colorScheme === 'light'
+            ? { ...LightTheme, fonts: NavLightTheme.fonts }
+            : { ...DarkTheme, fonts: NavDarkTheme.fonts }
+        }
+      >
+        <PaperProvider theme={theme}>
+          <Stack
+            screenOptions={{
+              animation: 'slide_from_bottom',
+              header: (props) => (
+                <StackHeader navProps={props} children={undefined} />
+              ),
+            }}
+          >
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="drawer" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="search"
+              options={{ title: Locales.t('search') }}
+            />
+            <Stack.Screen
+              name="modal"
+              options={{ title: Locales.t('titleModal'), presentation: 'modal' }}
+            />
+          </Stack>
+        </PaperProvider>
 
-      <StatusBar style="auto" />
-    </ThemeProvider>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </ReduxProvider>
   )
 }
 

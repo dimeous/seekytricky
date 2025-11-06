@@ -1,0 +1,7 @@
+### POST start Game
+POST https://dev-player.frozensun.ru/backend/player/start/65d049cf-8cab-4852-b0c7-5416b0d06b50
+Content-Type: application/json
+Authorization: Basic dGVzdDp0ZXN0
+
+{}
+###
